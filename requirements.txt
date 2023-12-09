@@ -3,3 +3,4 @@ mangum
 pydantic
 z3-solver
 hypercorn==0.14.4
+importlib-resources
