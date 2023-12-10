@@ -14,10 +14,10 @@ handler = Mangum(app)
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=["*"],  
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],   
+    allow_headers=["*"],  
 )
 
 class WeightedEdge:
@@ -171,61 +171,60 @@ async def solve(solve_request: SolveRequest):
     def extract_timeStep(line):
         parts = line.split("_")
         timeStepStr = parts[1].replace("timeStep", "")
-
-        print("extract_timeStep - line: ", line,
-              "timeStepStr: ", int(timeStepStr))
+        
         return int(timeStepStr)
 
+    # * SOVLER OUTPUT GOES HERE: solverList
     sortedLines = sorted(solverList, key=extract_timeStep)
     filteredLines = []
 
     for line in sortedLines:
         newLine = line.strip("\n").strip(" ")
-
+        
         if newLine.startswith("task") and newLine.endswith("True"):
             filteredLines.append(newLine)
         elif newLine.startswith("robot") and newLine.endswith("True"):
             filteredLines.append(newLine)
-
+                            
     def parse_line(line, allLines):
         parts = line.split("_")
         timeStep = int(parts[1].replace("timeStep", ""))
         entityType = None
         taskRoom = None
         status = None
-
+        
         if parts[0].startswith("robot"):
             entityType = "robots"
         elif parts[0].startswith("task"):
             entityType = "tasks"
         else:
             print("ERROR: unknown entity type")
-
+        
         entityID = parts[0].replace("robotID", "").replace("taskID", "")
-
+        
         room = None
         robotID = None
-
+        
         if entityType == "robots":
             room = int(parts[2].split(" = ")[0].replace("room", ""))
         # status = line.split(" = ")[1].strip()
-
+        
         if entityType == "tasks":
             robotID = int(parts[2].split(" = ")[0].replace("robotID", ""))
             status = parts[2].split(" = ")[1]
-
+            
             for eachLine in allLines:
                 newLine = eachLine.strip("\n").strip(" ")
-
+            
                 if newLine.startswith("robot") and newLine.endswith("True"):
                     lineParts = newLine.split("_")
                     lineRobotID = lineParts[0].replace("robotID", "")
                     lineTimeStep = lineParts[1].replace("timeStep", "")
-
+                    
                     if lineRobotID == str(robotID) and lineTimeStep == str(timeStep):
                         lineRoomPart = lineParts[2].split(" = ")[0]
                         taskRoom = int(lineRoomPart.replace("room", ""))
-
+                
                         # print(f"parse_line - Task {entityID}, TimeStep: {timeStep}, Task Room Set to: {taskRoom} based on line: {newLine}")
                         break
 
@@ -235,22 +234,20 @@ async def solve(solve_request: SolveRequest):
 
     for line in filteredLines:
         newLine = line.strip("\n").strip(" ")
-
+            
         if newLine.startswith("robot") and newLine.endswith("True"):
-            timeStep, entityType, entityID, room, robotID, taskRoom, status = parse_line(
-                newLine, sortedLines)
-
+            timeStep, entityType, entityID, room, robotID, taskRoom, status = parse_line(newLine, sortedLines)
+            
             if timeStep not in backend["timeline"]:
                 backend["timeline"][timeStep] = {"robotsLocations": {}}
-
+                
             backend["timeline"][timeStep]["robotsLocations"][entityID] = {
                 "id": entityID,
                 "room": room,
             }
 
         if newLine.startswith("task"):
-            timeStep, entityType, entityID, room, robotID, taskRoom, status = parse_line(
-                newLine, sortedLines)
+            timeStep, entityType, entityID, room, robotID, taskRoom, status = parse_line(newLine, sortedLines)
 
             if status == "True":
                 if entityID not in backend["tasksLocations"]:
@@ -263,36 +260,38 @@ async def solve(solve_request: SolveRequest):
                         "dropOffRoom": None,
                         "dropOffTime": None,
                     }
-
+                                    
                     if robotID not in backend["whoCarriesWhat"]:
                         backend["whoCarriesWhat"][robotID] = [entityID]
                     else:
                         backend["whoCarriesWhat"][robotID].append(entityID)
-
+                    
                 tasks[entityID] = {"timeStep": timeStep, "robotID": robotID}
 
     for entityID, info in tasks.items():
         drop_off_time = info["timeStep"] + 1
         backend["tasksLocations"][entityID]["dropOffTime"] = drop_off_time
-
+                
         for line in filteredLines:
             newLine = line.strip("\n").strip(" ")
-
+                    
             if newLine.startswith("robot") and newLine.endswith("True"):
                 lineParts = newLine.split("_")
                 lineRobotID = lineParts[0].replace("robotID", "")
                 lineTimeStep = lineParts[1].replace("timeStep", "")
-
+                        
                 if lineRobotID == str(info["robotID"]) and lineTimeStep == str(drop_off_time):
                     lineRoomPart = lineParts[2].split(" = ")[0]
                     taskRoom = int(lineRoomPart.replace("room", ""))
-
+                    
                     backend["tasksLocations"][entityID]["dropOffRoom"] = taskRoom
-
+                    
                     break
 
+    # print()
     print("BACKEND")
     print(backend)
+    # print()
 
     return backend
 
