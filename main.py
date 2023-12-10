@@ -135,6 +135,8 @@ async def solve(solve_request: SolveRequest):
         end_room = int(task.endRoom)
 
         new_task = Task(task_id, start_room, end_room)
+        
+        print("Task: ", new_task.id, "Start: ", new_task.start, "End: ", new_task.end)
 
         TASKS.append(new_task)
 
@@ -144,6 +146,8 @@ async def solve(solve_request: SolveRequest):
         start_room = int(robot.startRoom)
 
         new_robot = Robot(robot_id, start_room)
+        
+        print("Robot: ", new_robot.id, "Start: ", new_robot.start)
 
         ROBOTS.append(new_robot)
 
