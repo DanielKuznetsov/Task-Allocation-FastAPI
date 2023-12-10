@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from pydantic import BaseModel
 from uuid import uuid4
@@ -10,6 +11,15 @@ import time
 app = FastAPI()
 
 handler = Mangum(app)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],   
+    allow_headers=["*"],  
+)
 
 class WeightedEdge:
     def __init__(self, start, end, weight) -> None:
