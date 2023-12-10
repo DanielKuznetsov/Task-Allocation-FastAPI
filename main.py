@@ -292,8 +292,8 @@ async def solve(solve_request: SolveRequest):
 
                     break
 
-    print("BACKEND")
-    print(backend)
+    # print("BACKEND")
+    # print(backend)
 
     return backend
 
@@ -475,8 +475,12 @@ def create_solver(robots, tasks, rooms, weighted_edges, T, capacity=1):
 
         for d in m.decls():
             line = f"{d.name()} = {m[d]}"
-            print("LINE:")
-            print(line)
+            # print("LINE:")
+            # print(line)
             solverList.append(line)
 
     return solverList
+
+@app.get("/z3version")
+def z3_version():
+    return {"z3_version": z3.get_version_string()}
