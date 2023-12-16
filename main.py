@@ -11,8 +11,6 @@ app = FastAPI()
 
 handler = Mangum(app)
 
-origins = [ "https://task-allocation.up.railway.app", ]
-
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
