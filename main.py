@@ -317,15 +317,14 @@ async def solve(solve_request: SolveRequest):
                 robot_location["status"] = "dropped off"
 
             if timeStep == last_time_step and robot_location["status"] == "dropped off":
-                robot_location["status"] = "finished"
+                robot_location["status"] = "completed"
                 
             if previous_room is not None and previous_room != robot_location["room"]:
                 same_room = False
             previous_room = robot_location["room"]
 
         if same_room:
-            backend["timeline"][last_time_step]["robotsLocations"][robot_id]["status"] = "finished"
-
+            backend["timeline"][last_time_step]["robotsLocations"][robot_id]["status"] = "completed"
 
     return backend
 
