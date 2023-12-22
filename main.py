@@ -247,6 +247,7 @@ async def solve(solve_request: SolveRequest):
             backend["timeline"][timeStep]["robotsLocations"][entityID] = {
                 "id": entityID,
                 "room": room,
+                "status": None
             }
 
         if newLine.startswith("task"):
