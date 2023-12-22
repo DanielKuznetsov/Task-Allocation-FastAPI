@@ -310,6 +310,15 @@ async def solve(solve_request: SolveRequest):
             # *** is on its way to pick up, drop of the task, or is carrying the task
             if timeStep > task["pickUpTime"] and timeStep < task["dropOffTime"] or robot_location["room"] == 0:
                 robot_location["status"] = "en route"
+                
+            if robot_location["room"] != 0:
+                current_room = robot_location["room"]
+                roomMatched = any(task["pickUpRoom"] == current_room for task in backend["tasksLocations"].values())
+
+                if roomMatched:
+                    pass
+                else:
+                    robot_location["status"] = "en route"
 
             if timeStep == task["pickUpTime"]:
                 robot_location["status"] = "picked up"
