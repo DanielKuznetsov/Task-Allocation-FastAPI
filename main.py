@@ -313,7 +313,12 @@ async def solve(solve_request: SolveRequest):
                 
             if robot_location["room"] != 0:
                 current_room = robot_location["room"]
-                roomMatched = any(task["pickUpRoom"] == current_room for task in backend["tasksLocations"].values())
+                roomMatched = False
+
+                for task_id, task in backend["tasksLocations"].items():
+                    if task["pickUpRoom"] == current_room and task["pickUpTime"] == timeStep:
+                        roomMatched = True
+                        break
 
                 if roomMatched:
                     pass
