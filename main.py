@@ -305,38 +305,38 @@ async def solve(solve_request: SolveRequest):
 
             if timeStep == 0:
                 robot_location["status"] = "idle"
-
-            # *** This is an important status update: en route means that the robot 
-            # *** is on its way to pick up, drop of the task, or is carrying the task
-            if timeStep > task["pickUpTime"] and timeStep < task["dropOffTime"] or robot_location["room"] == 0:
-                robot_location["status"] = "en route"
-
-            if timeStep == task["pickUpTime"]:
-                robot_location["status"] = "picked up"
-
-            if timeStep == task["dropOffTime"]:
-                robot_location["status"] = "dropped off"
-
-            if timeStep == last_time_step and robot_location.get("status") == "dropped off":
-                robot_location["status"] = "completed"
-                
-            if previous_room is not None and previous_room != robot_location["room"]:
-                same_room = False
-            previous_room = robot_location["room"]
-            
-            if robot_location["room"] != 0:
-                current_room = robot_location["room"]
-                roomMatched = False
-
-                for task_id, task in backend["tasksLocations"].items():
-                    if task["pickUpRoom"] == current_room and task["pickUpTime"] == timeStep:
-                        roomMatched = True
-                        break
-
-                if roomMatched:
-                    pass
-                else:
+            else:
+                # *** This is an important status update: en route means that the robot 
+                # *** is on its way to pick up, drop of the task, or is carrying the task
+                if timeStep > task["pickUpTime"] and timeStep < task["dropOffTime"] or robot_location["room"] == 0:
                     robot_location["status"] = "en route"
+
+                if timeStep == task["pickUpTime"]:
+                    robot_location["status"] = "picked up"
+
+                if timeStep == task["dropOffTime"]:
+                    robot_location["status"] = "dropped off"
+
+                if timeStep == last_time_step and robot_location.get("status") == "dropped off":
+                    robot_location["status"] = "completed"
+                    
+                if previous_room is not None and previous_room != robot_location["room"]:
+                    same_room = False
+                previous_room = robot_location["room"]
+                
+                if robot_location["room"] != 0:
+                    current_room = robot_location["room"]
+                    roomMatched = False
+
+                    for task_id, task in backend["tasksLocations"].items():
+                        if task["pickUpRoom"] == current_room and task["pickUpTime"] == timeStep:
+                            roomMatched = True
+                            break
+
+                    if roomMatched:
+                        pass
+                    else:
+                        robot_location["status"] = "en route"
 
         if same_room:
             backend["timeline"][last_time_step]["robotsLocations"][robot_id]["status"] = "completed"
