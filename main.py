@@ -247,7 +247,7 @@ async def solve(solve_request: SolveRequest):
             backend["timeline"][timeStep]["robotsLocations"][entityID] = {
                 "id": entityID,
                 "room": room,
-                "status": None
+                "status": ""
             }
 
         if newLine.startswith("task"):
@@ -317,7 +317,7 @@ async def solve(solve_request: SolveRequest):
             if timeStep == task["dropOffTime"]:
                 robot_location["status"] = "dropped off"
 
-            if timeStep == last_time_step and robot_location["status"] == "dropped off":
+            if timeStep == last_time_step and robot_location.get("status") == "dropped off":
                 robot_location["status"] = "completed"
                 
             if previous_room is not None and previous_room != robot_location["room"]:
