@@ -324,19 +324,19 @@ async def solve(solve_request: SolveRequest):
                     same_room = False
                 previous_room = robot_location["room"]
                 
-                if robot_location["room"] != 0:
-                    current_room = robot_location["room"]
-                    roomMatched = False
+                # if robot_location["room"] != 0:
+                #     current_room = robot_location["room"]
+                #     roomMatched = False
 
-                    for task_id, task in backend["tasksLocations"].items():
-                        if task["pickUpRoom"] == current_room and task["pickUpTime"] == timeStep:
-                            roomMatched = True
-                            break
+                #     for task_id, task in backend["tasksLocations"].items():
+                #         if task["pickUpRoom"] == current_room and task["pickUpTime"] == timeStep:
+                #             roomMatched = True
+                #             break
 
-                    if roomMatched:
-                        pass
-                    else:
-                        robot_location["status"] = "en route"
+                #     if roomMatched:
+                #         pass
+                #     else:
+                #         robot_location["status"] = "en route"
 
         if same_room:
             backend["timeline"][last_time_step]["robotsLocations"][robot_id]["status"] = "completed"
