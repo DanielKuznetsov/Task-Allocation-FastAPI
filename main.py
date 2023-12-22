@@ -292,8 +292,40 @@ async def solve(solve_request: SolveRequest):
 
                     break
 
-    # print("BACKEND")
-    # print(backend)
+    last_time_step = max(backend["timeline"].keys())
+
+    for task in backend["tasksLocations"].values():
+        robot_id = str(task["robotDeployed"])
+        same_room = True
+        previous_room = None
+
+        for timeStep, robots in backend["timeline"].items():
+            robot_location = robots["robotsLocations"][robot_id]
+
+            if timeStep == 0:
+                robot_location["status"] = "idle"
+
+            # *** This is an important status update: en route means that the robot 
+            # *** is on its way to pick up, drop of the task, or is carrying the task
+            if timeStep > task["pickUpTime"] and timeStep < task["dropOffTime"] or robot_location["room"] == 0:
+                robot_location["status"] = "en route"
+
+            if timeStep == task["pickUpTime"]:
+                robot_location["status"] = "picked up"
+
+            if timeStep == task["dropOffTime"]:
+                robot_location["status"] = "dropped off"
+
+            if timeStep == last_time_step and robot_location["status"] == "dropped off":
+                robot_location["status"] = "finished"
+                
+            if previous_room is not None and previous_room != robot_location["room"]:
+                same_room = False
+            previous_room = robot_location["room"]
+
+        if same_room:
+            backend["timeline"][last_time_step]["robotsLocations"][robot_id]["status"] = "finished"
+
 
     return backend
 
