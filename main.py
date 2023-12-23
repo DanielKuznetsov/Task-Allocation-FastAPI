@@ -308,7 +308,7 @@ async def solve(solve_request: SolveRequest):
             else:
                 # *** This is an important status update: en route means that the robot 
                 # *** is on its way to pick up, drop of the task, or is carrying the task
-                if timeStep > task["pickUpTime"] and timeStep < task["dropOffTime"] or robot_location["room"] == 0:
+                if timeStep > task["pickUpTime"] and timeStep < task["dropOffTime"] and robot_location["room"] == 0:
                     robot_location["status"] = "delivering"
 
                 if timeStep == task["pickUpTime"]:
